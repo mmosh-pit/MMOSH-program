@@ -35,7 +35,7 @@ async function createNewMint(
 
   console.log(`The token mint account address is ${tokenMint}`);
   console.log(
-    `Token Mint: https://explorer.solana.com/address/${tokenMint}?cluster=devnet`
+    `Token Mint: https://explorer.solana.com/address/${tokenMint}?cluster=mainnet-beta`
   );
 
   return tokenMint;
@@ -55,7 +55,7 @@ async function createTokenAccount(
   );
 
   console.log(
-    `Token Account: https://explorer.solana.com/address/${tokenAccount.address}?cluster=devnet`
+    `Token Account: https://explorer.solana.com/address/${tokenAccount.address}?cluster=mainnet-beta`
   );
 
   return tokenAccount;
@@ -81,13 +81,13 @@ async function mintTokens(
   );
 
   console.log(
-    `Mint Token Transaction: https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
+    `Mint Token Transaction: https://explorer.solana.com/tx/${transactionSignature}?cluster=mainnet-beta`
   );
 }
 
 async function main() {
-  const endpoint = clusterApiUrl("devnet");
-  const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+  const endpoint = clusterApiUrl("mainnet-beta");
+  const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
   const payer = getKeypairFromEnvironment("SECRET_KEY");
 
   const mintAuthority = getKeypairFromEnvironment("SECRET_KEY");
