@@ -5,7 +5,6 @@ import { createUmi } from "@metaplex-foundation/umi-bundle-defaults";
 import {
   TokenStandard,
   createV1,
-  createFungible,
 } from "@metaplex-foundation/mpl-token-metadata";
 import {
   createSignerFromKeypair,
@@ -16,6 +15,7 @@ import {
   fromWeb3JsPublicKey,
 } from "@metaplex-foundation/umi-web3js-adapters";
 import * as dotenv from "dotenv";
+
 dotenv.config();
 
 async function createNewMint(
@@ -35,7 +35,7 @@ async function createNewMint(
 
   console.log(`The token mint account address is ${tokenMint}`);
   console.log(
-    `Token Mint: https://explorer.solana.com/address/${tokenMint}?cluster=testnet`
+    `Token Mint: https://explorer.solana.com/address/${tokenMint}?cluster=devnet`
   );
 
   return tokenMint;
@@ -55,7 +55,7 @@ async function createTokenAccount(
   );
 
   console.log(
-    `Token Account: https://explorer.solana.com/address/${tokenAccount.address}?cluster=testnet`
+    `Token Account: https://explorer.solana.com/address/${tokenAccount.address}?cluster=devnet`
   );
 
   return tokenAccount;
@@ -81,20 +81,20 @@ async function mintTokens(
   );
 
   console.log(
-    `Mint Token Transaction: https://explorer.solana.com/tx/${transactionSignature}?cluster=testnet`
+    `Mint Token Transaction: https://explorer.solana.com/tx/${transactionSignature}?cluster=devnet`
   );
 }
 
 async function main() {
   const endpoint = clusterApiUrl("devnet");
-  const connection = new Connection(endpoint, "confirmed");
-
+  const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
   const payer = getKeypairFromEnvironment("SECRET_KEY");
+
   const mintAuthority = getKeypairFromEnvironment("SECRET_KEY");
   const freezeAuthority = getKeypairFromEnvironment("SECRET_KEY");
-  const owner = new PublicKey("5NwEZHn1yAe9xPHAGuJX8dbwPykNPXtrjL7Q2fK4hjMc");
+  const owner = new PublicKey("FNEVrBHXaD1Zefx3o9TsFZiMnSbUeUmBqHPaQSYCHLVw");
   const TOKEN_DECIMALS = 9;
-  const MAX_SUPPLY = 10000000000;
+  const MAX_SUPPLY = 10000000000000000000;
 
   const umi = createUmi(endpoint);
   const payer_keypair = fromWeb3JsKeypair(payer);
@@ -102,9 +102,27 @@ async function main() {
   umi.identity = signer;
   umi.payer = signer;
 
-  // const mint = fromWeb3JsPublicKey(
-  //   new PublicKey("E1pXbzx4SMd1oUtbXz8crcNezykEZgbVS6dCjns5ZARe")
-  // );
+  //   const offChainMetadata = {
+  //     name: "MMOSH: The Stoked Token",
+  //     symbol: "MMOSH",
+  //     description:
+  //       "Join us in the MMOSH Pit, a Massively-Multiplayer On-chain Shared Hallucination.",
+  //     image:
+  //       "https://shdw-drive.genesysgo.net/7nPP797RprCMJaSXsyoTiFvMZVQ6y1dUgobvczdWGd35/MMoshCoin.png",
+  //   };
+  //   const shadowURL =
+  //     "https://shdw-drive.genesysgo.net/7nPP797RprCMJaSXsyoTiFvMZVQ6y1dUgobvczdWGd35/MMOSH.json";
+
+  const shadowURL =
+    "https://bafkreie5ewzrygdt5otou7ody6ctpunlj4lyptxjttumpebyju4wyszkim.ipfs.nftstorage.link/";
+  const offChainMetadata = {
+    name: "Toxen",
+    symbol: "Tox",
+    description: "True Ox",
+    image:
+      "https://upload.wikimedia.org/wikipedia/commons/7/71/Zakros_bull's_head_rhyton_archnmus_Heraklion.jpg",
+  };
+  const token_standard = TokenStandard.Fungible;
 
   const mint = await createNewMint(
     connection,
@@ -113,9 +131,6 @@ async function main() {
     freezeAuthority.publicKey, // And the freeze authority >:)
     TOKEN_DECIMALS // !
   );
-
-  //const mint = new PublicKey('CcYGhbFFSx1wCU4RrFJAXF93G995wf1PmcH3qBST4i1g');// DKD Test 1
-  //const mint = new PublicKey('9rLMQhLGZ6f855VuNfcS7tMQ4EiYjSqRPj1rYY6cwpkg');// DKD Test 2
 
   const tokenAccount = await createTokenAccount(
     connection,
@@ -131,42 +146,30 @@ async function main() {
     mint,
     tokenAccount.address,
     mintAuthority,
-    MAX_SUPPLY * 10 ** TOKEN_DECIMALS
+    MAX_SUPPLY
   );
 
-  const updateAuthority = createSignerFromKeypair(umi, payer_keypair);
+  const mintAddreess = fromWeb3JsPublicKey(new PublicKey(mint.toBase58()));
 
-  // SET THESE VALUESz
-  const mintAddress = "29Xg3Q4xqj76fN6HukwuNdZhLFqKmnSbtEJpTT7GQV1J";
-  // const mint = fromWeb3JsPublicKey(new PublicKey(mintAddress));
-  const token_standard = TokenStandard.Fungible;
-  const shadowURL =
-    "https://bafkreiakhpegkfvz2qhpwpr3aazobyeohgkvrdz2ld4o3bgpzkewinwhda.ipfs.nftstorage.link/";
-  const offChainMetadata = {
-    name: "DKD test 1",
-    symbol: "DKDTest1",
-    description: "This is a test of a big token",
-    image: "https://i.stack.imgur.com/kqhKa.png",
-  };
+  setTimeout(async () => {
+    await createV1(umi, {
+      mint: mintAddreess,
+      name: offChainMetadata.name,
+      symbol: offChainMetadata.symbol,
+      uri: shadowURL,
+      sellerFeeBasisPoints: percentAmount(0),
+      tokenStandard: token_standard,
+    }).sendAndConfirm(umi);
 
-  await createV1(umi, {
-    mint: fromWeb3JsPublicKey(mint),
-    updateAuthority: updateAuthority.publicKey,
-    name: offChainMetadata.name,
-    symbol: offChainMetadata.symbol,
-    uri: shadowURL,
-    sellerFeeBasisPoints: percentAmount(0),
-    tokenStandard: token_standard,
-  }).sendAndConfirm(umi);
-
-  await token.setAuthority(
-    connection,
-    payer,
-    mint,
-    mintAuthority, //mintAuthoritys
-    token.AuthorityType.MintTokens,
-    null // this sets the mint authority to null
-  );
+    await token.setAuthority(
+      connection,
+      payer,
+      mint,
+      mintAuthority, //mintAuthority
+      token.AuthorityType.MintTokens,
+      null // this sets the mint authority to null
+    );
+  }, 10000);
 }
 
 main();
