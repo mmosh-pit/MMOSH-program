@@ -92,7 +92,7 @@ async function main() {
 
   const mintAuthority = getKeypairFromEnvironment("SECRET_KEY");
   const freezeAuthority = getKeypairFromEnvironment("SECRET_KEY");
-  const owner = new PublicKey("FNEVrBHXaD1Zefx3o9TsFZiMnSbUeUmBqHPaQSYCHLVw");
+  const owner = new PublicKey("7zP1BjWppJNpVj1ioxpKE9SaejxSismd8J7d3ortEcNn");
   const TOKEN_DECIMALS = 9;
   const MAX_SUPPLY = 10000000000000000000;
 
@@ -102,26 +102,17 @@ async function main() {
   umi.identity = signer;
   umi.payer = signer;
 
-  //   const offChainMetadata = {
-  //     name: "MMOSH: The Stoked Token",
-  //     symbol: "MMOSH",
-  //     description:
-  //       "Join us in the MMOSH Pit, a Massively-Multiplayer On-chain Shared Hallucination.",
-  //     image:
-  //       "https://shdw-drive.genesysgo.net/7nPP797RprCMJaSXsyoTiFvMZVQ6y1dUgobvczdWGd35/MMoshCoin.png",
-  //   };
-  //   const shadowURL =
-  //     "https://shdw-drive.genesysgo.net/7nPP797RprCMJaSXsyoTiFvMZVQ6y1dUgobvczdWGd35/MMOSH.json";
-
-  const shadowURL =
-    "https://bafkreie5ewzrygdt5otou7ody6ctpunlj4lyptxjttumpebyju4wyszkim.ipfs.nftstorage.link/";
   const offChainMetadata = {
-    name: "Toxen",
-    symbol: "Tox",
-    description: "True Ox",
+    name: "MMOSH: The Stoked Token",
+    symbol: "MMOSH",
+    description:
+      "Join us in the MMOSH Pit, a Massively-Multiplayer On-chain Shared Hallucination.",
     image:
-      "https://upload.wikimedia.org/wikipedia/commons/7/71/Zakros_bull's_head_rhyton_archnmus_Heraklion.jpg",
+      "https://shdw-drive.genesysgo.net/7nPP797RprCMJaSXsyoTiFvMZVQ6y1dUgobvczdWGd35/MMoshCoin.png",
   };
+  const shadowURL =
+    "https://shdw-drive.genesysgo.net/7nPP797RprCMJaSXsyoTiFvMZVQ6y1dUgobvczdWGd35/MMOSH.json";
+
   const token_standard = TokenStandard.Fungible;
 
   const mint = await createNewMint(
